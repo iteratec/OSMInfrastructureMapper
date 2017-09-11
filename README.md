@@ -12,6 +12,6 @@ localhost:9090
 
 Uses ECMAScript 2016
 
-Colors inspired from https://github.com/iteratec/OpenSpeedMonitor/blob/master/grails-app/assets/stylesheets/variables-corporate.less
+Colors inspired from [here](https://github.com/iteratec/OpenSpeedMonitor/blob/master/grails-app/assets/stylesheets/variables-corporate.less)
 
 Uses karmilla-regular font. Which is the same font that is also used on the website https://www.iteratec.de.
