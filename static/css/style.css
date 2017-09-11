@@ -1,0 +1,47 @@
+@font-face {
+  font-family: "karmilla-regular";
+  src: url("/fonts/Karmilla-Regular-015.ttf");
+}
+
+form button, form label {
+  font-size: 14px;
+}
+
+form button, form label, .node {
+  font-family: "karmilla-regular", sans-serif;
+}
+
+.node {
+  font-size: 14px;
+  cursor: default;
+}
+
+.link {
+  fill: none;
+  stroke: #989dad;
+  stroke-width: 1px;
+}
+
+.hidden {
+  display: none;
+}
+
+.alert {
+  color: #f01715;
+}
+
+.warn {
+  color: #ff7800;
+}
+
+input:disabled+label {
+  color: #848484
+}
+
+#filter {
+  position: fixed;
+}
+
+#graph {
+  margin-top: 1.9cm;
+}

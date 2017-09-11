@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>OSMIM - OpenSpeedMonitor Infrastructure Mapper</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+  <span id="filter">
+    <form id="filterNodes">
+      <input name="hideWPT" type="checkbox" onchange="filterNodes()" checked/>
+      <label for="hideWPT">
+        Hide webpagetest.org.
+      </label>
+      <input name="hideOffline" type="checkbox" onchange="filterNodes()" checked/>
+      <label for="hideOffline">
+        Hide locations without testers.
+      </label>
+      <input name="showBrowsers" type="checkbox" onchange="filterNodes()"/>
+      <label for="showBrowsers">
+        Show browsers instead of agents.
+      </label>
+    </form>
+    <form onsubmit="filterNodes();return false;" id="filterByText">
+      <label>WPT instances: <input name="wpt" type="text "></label>
+      <label>Locations: <input name="loc" type="text "></label>
+      <label>Agents: <input name="agent" type="text "></label>
+      <button type="submit">Filter</button>
+    </form>
+  </span>
+  <svg id="graph" />
+
+  <div id="legend" class="hidden">
+    <h3>Color Legend</h3>
+    <ul>
+      <li class="alert">Error, see server log for details.</li>
+      <li class="warn">More than 30 minutes since last check or more than 120 minutes since last work of wpt agent.</li>
+    </ul>
+  </div>
+
+  <script src="js/create-graph.js"></script>
+</body>
+
+</html>
