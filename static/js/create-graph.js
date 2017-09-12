@@ -11,6 +11,8 @@ let width,
   osmInfo,
   osmToLoc,
 
+  hiddenWptSubtrees,
+  hiddenLocSubtrees,
   hierarchyOrig,
   hierarchyFiltered,
   browserHierarchy,
@@ -31,7 +33,30 @@ const iteratecBlue = "#008cd2",
   osmGray = "#2f323a",
   osmGrayDarker = "#989dad",
   orange = "#ff7800",
-  red = "#f01715";
+  red = "#f01715",
+  hiddenSubtreeOpacity = 0.4;
+
+function filterWptSubtree(element) {
+  if (hiddenWptSubtrees.includes(element.textContent))
+    hiddenWptSubtrees.splice(hiddenWptSubtrees.indexOf(element.textContent));
+  else
+    hiddenWptSubtrees.push(element.textContent);
+  filterNodes();
+}
+
+function filterLocSubtree(element) {
+  d3.select("svg").selectAll(".link-wpt")
+    .filter(link => link.targetId == element.id)
+    .each(link => {
+      const hLS = hiddenLocSubtrees.get(link.sourceName);
+      if (hLS.includes(element.textContent))
+        hLS.splice(hLS.indexOf(element.textContent));
+      else
+        hLS.push(element.textContent);
+    });
+
+  filterNodes();
+}
 
 //Param highlight is false if the links should be unhighlighted, true otherwise.
 d3.selection.prototype.markLinks = function(highlight) {
@@ -126,7 +151,8 @@ function markAgentNodes(element, highlight) {
   svg.selectAll(".link-loc")
     .filter(link => link.targetId == element.id)
     .markLinks(highlight)
-    .each(link => markLocUpToRoot(link.sourceName, link.sourceId, highlight, svg));
+    .each(link =>
+      markLocUpToRoot(link.sourceName, link.sourceId, highlight, svg));
 }
 
 function drawScene() {
@@ -186,7 +212,9 @@ function drawScene() {
 
   agentNodes.append("title").text(d => "Last Check: " + d.data.LastCheck +
     "\n" + "Last Work: " + d.data.LastWork);
-  wptNodes.style("fill", d => d.data.Err ? red : null);
+  wptNodes.style("fill", d => d.data.Err ? red : null)
+    .style("opacity", d => hiddenWptSubtrees.includes(d.data.Name) ?
+      hiddenSubtreeOpacity : null);
   agentNodes.style("fill",
     d => d.data.LastCheck >= 30 || d.data.LastWork >= 120 ? orange : null);
 
@@ -243,10 +271,21 @@ function drawScene() {
   //by exploiting the d3 data binding by index possibilities.
   links.data(hierarchyFiltered.Children).remove();
 
+  const wptLinkNodes = links.filter(".link-wpt");
+  locNodes.style("opacity", loc => {
+    let hiddenSubtree = false;
+    wptLinkNodes.filter(link => link.targetId == loc.id)
+      .each(link => hiddenSubtree = hiddenSubtree ||
+        hiddenLocSubtrees.get(link.sourceName).includes(loc.data.Name));
+    return hiddenSubtree ? hiddenSubtreeOpacity : null;
+  });
+
   wptNodes.attr("onmouseover", "markWptNodes(this, true)")
-    .attr("onmouseout", "markWptNodes(this)");
+    .attr("onmouseout", "markWptNodes(this)")
+    .attr("onclick", "filterWptSubtree(this)");
   locNodes.attr("onmouseover", "markLocNodes(this, true)")
-    .attr("onmouseout", "markLocNodes(this)");
+    .attr("onmouseout", "markLocNodes(this)")
+    .attr("onclick", "filterLocSubtree(this)");
   agentNodes.attr("onmouseover", "markAgentNodes(this, true)")
     .attr("onmouseout", "markAgentNodes(this)");
 
@@ -314,14 +353,15 @@ function filterNodes() {
   hierarchyFiltered = JSON.parse(JSON.stringify(
     showBrowsers ? browserHierarchy : hierarchyOrig));
   hierarchyFiltered.Children = hierarchyFiltered.Children.filter(wpt =>
-    wpt.Name.toLowerCase().includes(filterText.wpt.value.toLowerCase()) &&
-    (!filterNodes.hideWPT.checked || wpt.Name != "www.webpagetest.org"));
+    wpt.Name.toLowerCase().includes(filterText.wpt.value.toLowerCase()));
   hierarchyFiltered.Children.forEach((wpt, i, wpts) => {
+    const hLS = hiddenLocSubtrees.get(wpt.Name);
     wpts[i].Children = wpts[i].Children.filter(loc =>
+      !hiddenWptSubtrees.includes(wpt.Name) &&
       loc.Name.toLowerCase().includes(filterText.loc.value.toLowerCase()) &&
       (!filterNodes.hideOffline.checked || !loc.Offline));
     wpts[i].Children.forEach((loc, j, locs) => locs[j].Children =
-      loc.Children.filter(agent =>
+      loc.Children.filter(agent => !hLS.includes(loc.Name) &&
         agent.Name.toLowerCase().includes(filterText.agent.value.toLowerCase()))
     );
   });
@@ -347,6 +387,15 @@ d3.json("getData", data => {
   osmInfo = data.OsmToInfo;
   hierarchyOrig = data.Hierarchy;
   browserHierarchy = data.BrowserHierarchy;
+
+  //Wpt text labels are unique, so every wpt node can be unambiguously
+  //identified by its label. Location labels are however not unique. That's
+  //why we identify location nodes in the map hiddenLocSubtrees by
+  //storing the hidden location labels array as the value of its parent wpt
+  //node, which is the key.
+  hiddenWptSubtrees = ["www.webpagetest.org"];
+  hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
+    wpt => [wpt.Name, []]));
 
   filterNodes();
   window.addEventListener('resize', drawScene);

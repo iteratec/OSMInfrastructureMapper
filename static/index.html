@@ -10,10 +10,6 @@
 <body>
   <span id="filter">
     <form id="filterNodes">
-      <input name="hideWPT" type="checkbox" onchange="filterNodes()" checked/>
-      <label for="hideWPT">
-        Hide webpagetest.org.
-      </label>
       <input name="hideOffline" type="checkbox" onchange="filterNodes()" checked/>
       <label for="hideOffline">
         Hide locations without testers.
@@ -37,6 +33,7 @@
     <ul>
       <li class="alert">Error, see server log for details.</li>
       <li class="warn">More than 30 minutes since last check or more than 120 minutes since last work of wpt agent.</li>
+      <li class="opaque">Subtree hidden</li>
     </ul>
   </div>
 

@@ -16,6 +16,10 @@ form button, form label, .node {
   cursor: default;
 }
 
+.node-wpt, .node-loc {
+  cursor: pointer;
+}
+
 .link {
   fill: none;
   stroke: #989dad;
@@ -32,6 +36,10 @@ form button, form label, .node {
 
 .warn {
   color: #ff7800;
+}
+
+.opaque {
+  opacity: 0.4;
 }
 
 input:disabled+label {
