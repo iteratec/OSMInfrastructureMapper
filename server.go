@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"encoding/xml"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -19,21 +19,17 @@ func calcData(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	osmServers := strings.Split(os.Getenv("OSMIM_OSM_SERVERS"), " ")
 	osmToInfo := make(map[string]osmInfo)
 	wptURLsToLabels := make(map[string][]string)
 	wptURLsToBrowsers := make(map[string][]string)
-
-	osmServers, err := ioutil.ReadFile("osm-servers.txt")
-	if err != nil {
-		log.Panic(err)
-	}
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	c := &http.Client{Timeout: 10 * time.Second, Transport: tr}
 
-	for _, s := range strings.Split(string(osmServers), "\n") {
+	for _, s := range osmServers {
 		if s != "" {
 			var targets osmTargets
 
