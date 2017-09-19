@@ -160,8 +160,11 @@ function drawScene() {
   d3.select("svg").selectAll("*").remove();
 
   const osmTextWidth = 275;
-  const agentTextWidth = 350;
-  width = window.innerWidth;
+  const agentTextWidth = 300;
+
+  //Subtract a constant from the window.innerWidth to compensate the width of
+  //the vertical scrollbar.
+  width = window.innerWidth - 25;
   height = Math.max(window.innerHeight, nOfLeafs * 15);
   treeWidth = width - (osmTextWidth + agentTextWidth);
   treeHeight = height - 100;
