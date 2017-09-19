@@ -159,17 +159,18 @@ function drawScene() {
   document.getElementById("legend").className = "hidden";
   d3.select("svg").selectAll("*").remove();
 
-  const outerNodesTextWidth = 250;
+  const osmTextWidth = 275;
+  const agentTextWidth = 350;
   width = window.innerWidth;
   height = Math.max(window.innerHeight, nOfLeafs * 15);
-  treeWidth = width - 2 * outerNodesTextWidth;
+  treeWidth = width - (osmTextWidth + agentTextWidth);
   treeHeight = height - 100;
 
   const svg = d3.select("svg")
     .attr("width", width)
     .attr("height", height)
     .append("g")
-    .attr("transform", "translate(" + outerNodesTextWidth + "," + 0 + ")");
+    .attr("transform", "translate(" + osmTextWidth + "," + 0 + ")");
 
   // bl.ocks.org/mbostock/4339184
   tree = d3.tree().size([treeHeight, treeWidth])(dummyRoot);
