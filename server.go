@@ -56,7 +56,7 @@ func calcData(w http.ResponseWriter, r *http.Request) {
 
 			//Eliminating duplicate baseURLs by adding them to this map
 			wptURLs := make(map[wptServer]bool)
-			var locs, wpts, browsers []string
+			locs, wpts, browsers := []string{}, []string{}, []string{}
 			for _, t := range targets.Target {
 				if t.Active {
 					wptURLs[t.WptServer] = true
@@ -76,7 +76,8 @@ func calcData(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var h, bH hierarchy
+	h, bH := hierarchy{Children: []wptHierarchy{}},
+		hierarchy{Children: []wptHierarchy{}}
 	for wpt := range wptURLsToLabels {
 		var testers getTesters
 
