@@ -22,7 +22,7 @@ func calcData(w http.ResponseWriter, r *http.Request) {
 	osmServers := strings.Split(os.Getenv("OSMIM_OSM_SERVERS"), " ")
 	osmToInfo := make(map[string]osmInfo)
 	wptURLsToLabels := make(map[string][]string)
-	wptURLsToBrowsers := make(map[string][]string)
+	wptURLsToBrowsers := make(map[string]map[string]bool)
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -60,11 +60,13 @@ func calcData(w http.ResponseWriter, r *http.Request) {
 			for _, t := range targets.Target {
 				if t.Active {
 					wptURLs[t.WptServer] = true
+					if _, ok := wptURLsToBrowsers[t.WptServer.BaseURL]; !ok {
+						wptURLsToBrowsers[t.WptServer.BaseURL] = make(map[string]bool)
+					}
+					wptURLsToBrowsers[t.WptServer.BaseURL][t.UniqueIdentifierForServer] =
+						true
 					locs = append(locs, t.Location)
 					browsers = append(browsers, t.UniqueIdentifierForServer)
-					wptURLsToBrowsers[t.WptServer.BaseURL] =
-						append(wptURLsToBrowsers[t.WptServer.BaseURL],
-							t.UniqueIdentifierForServer)
 				}
 			}
 			for w := range wptURLs {
@@ -110,7 +112,7 @@ func calcData(w http.ResponseWriter, r *http.Request) {
 
 		wptH.Err = false
 		bWptH := wptH
-		for _, b := range wptURLsToBrowsers[wpt] {
+		for b := range wptURLsToBrowsers[wpt] {
 			bWptH.Children = append(bWptH.Children,
 				locHierarchy{Name: b, Children: []testerHierarchy{}})
 		}
