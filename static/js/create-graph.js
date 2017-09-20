@@ -38,7 +38,7 @@ const iteratecBlue = "#008cd2",
 
 function filterWptSubtree(element) {
   if (hiddenWptSubtrees.includes(element.textContent))
-    hiddenWptSubtrees.splice(hiddenWptSubtrees.indexOf(element.textContent));
+    hiddenWptSubtrees.splice(hiddenWptSubtrees.indexOf(element.textContent), 1);
   else
     hiddenWptSubtrees.push(element.textContent);
   filterNodes();
@@ -50,7 +50,7 @@ function filterLocSubtree(element) {
     .each(link => {
       const hLS = hiddenLocSubtrees.get(link.sourceName);
       if (hLS.includes(element.textContent))
-        hLS.splice(hLS.indexOf(element.textContent));
+        hLS.splice(hLS.indexOf(element.textContent), 1);
       else
         hLS.push(element.textContent);
     });
