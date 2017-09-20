@@ -48,6 +48,7 @@ input:disabled+label {
 
 #filter {
   position: fixed;
+  background-color: #fff;
 }
 
 #graph {
