@@ -19,11 +19,10 @@
         Show browsers instead of agents.
       </label>
     </form>
-    <form onsubmit="filterNodes();return false;" id="filterByText">
+    <form oninput="filterNodes()" id="filterByText">
       <label>WPT instances: <input name="wpt" type="text "></label>
       <label>Locations: <input name="loc" type="text "></label>
       <label>Agents: <input name="agent" type="text "></label>
-      <button type="submit">Filter</button>
     </form>
   </span>
   <svg id="graph" />
