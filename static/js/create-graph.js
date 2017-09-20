@@ -36,25 +36,33 @@ const iteratecBlue = "#008cd2",
   red = "#f01715",
   hiddenSubtreeOpacity = 0.4;
 
-function filterWptSubtree(element) {
-  if (hiddenWptSubtrees.includes(element.textContent))
-    hiddenWptSubtrees.splice(hiddenWptSubtrees.indexOf(element.textContent), 1);
-  else
-    hiddenWptSubtrees.push(element.textContent);
+function filterWptSubtree(element, event) {
+  if (event.ctrlKey) {
+    hiddenWptSubtrees = hierarchyOrig.Children
+      .filter(wpt => wpt.Name != element.textContent).map(wpt => wpt.Name);
+  } else {
+    if (hiddenWptSubtrees.includes(element.textContent))
+      hiddenWptSubtrees.splice(hiddenWptSubtrees.indexOf(element.textContent), 1);
+    else
+      hiddenWptSubtrees.push(element.textContent);
+  }
   filterNodes();
 }
 
-function filterLocSubtree(element) {
-  d3.select("svg").selectAll(".link-wpt")
-    .filter(link => link.targetId == element.id)
-    .each(link => {
-      const hLS = hiddenLocSubtrees.get(link.sourceName);
-      if (hLS.includes(element.textContent))
-        hLS.splice(hLS.indexOf(element.textContent), 1);
-      else
-        hLS.push(element.textContent);
-    });
-
+function filterLocSubtree(element, event) {
+  if (event.ctrlKey) {
+    console.log("asdf");
+  } else {
+    d3.select("svg").selectAll(".link-wpt")
+      .filter(link => link.targetId == element.id)
+      .each(link => {
+        const hLS = hiddenLocSubtrees.get(link.sourceName);
+        if (hLS.includes(element.textContent))
+          hLS.splice(hLS.indexOf(element.textContent), 1);
+        else
+          hLS.push(element.textContent);
+      });
+  }
   filterNodes();
 }
 
@@ -286,10 +294,10 @@ function drawScene() {
 
   wptNodes.attr("onmouseover", "markWptNodes(this, true)")
     .attr("onmouseout", "markWptNodes(this)")
-    .attr("onclick", "filterWptSubtree(this)");
+    .attr("onclick", "filterWptSubtree(this, event)");
   locNodes.attr("onmouseover", "markLocNodes(this, true)")
     .attr("onmouseout", "markLocNodes(this)")
-    .attr("onclick", "filterLocSubtree(this)");
+    .attr("onclick", "filterLocSubtree(this, event)");
   agentNodes.attr("onmouseover", "markAgentNodes(this, true)")
     .attr("onmouseout", "markAgentNodes(this)");
 
