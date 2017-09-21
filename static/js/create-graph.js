@@ -107,6 +107,8 @@ function markOsmNodes(element, highlight) {
   let wptIds = [];
   let locIds = [];
 
+  d3.select(element).style("fill", highlight ? iteratecMagentaDark : null);
+
   svg.selectAll(".link-osm")
     .filter(link => link.sourceName == element.textContent)
     .markLinks(highlight)
