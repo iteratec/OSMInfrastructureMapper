@@ -42,7 +42,8 @@ function filterWptSubtree(element, event) {
       .filter(wpt => wpt.Name != element.textContent).map(wpt => wpt.Name);
   } else {
     if (hiddenWptSubtrees.includes(element.textContent))
-      hiddenWptSubtrees.splice(hiddenWptSubtrees.indexOf(element.textContent), 1);
+      hiddenWptSubtrees.splice(
+        hiddenWptSubtrees.indexOf(element.textContent), 1);
     else
       hiddenWptSubtrees.push(element.textContent);
   }
@@ -50,19 +51,31 @@ function filterWptSubtree(element, event) {
 }
 
 function filterLocSubtree(element, event) {
-  if (event.ctrlKey) {
-    console.log("asdf");
-  } else {
-    d3.select("svg").selectAll(".link-wpt")
-      .filter(link => link.targetId == element.id)
-      .each(link => {
+  d3.select("svg").selectAll(".link-wpt")
+    .filter(link => link.targetId == element.id)
+    .each(link => {
+      if (event.ctrlKey) {
+        const wptSource = {
+          textContent: link.sourceName
+        };
+        hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
+          wpt => [wpt.Name, []]));
+
+        filterWptSubtree(wptSource, event);
+        hierarchyOrig.Children
+          .filter(wpt => wpt.Name == wptSource.textContent)
+          .forEach(wpt =>
+            wpt.Children.filter(loc => loc.Name != element.textContent)
+            .forEach(loc =>
+              hiddenLocSubtrees.get(wptSource.textContent).push(loc.Name)));
+      } else {
         const hLS = hiddenLocSubtrees.get(link.sourceName);
         if (hLS.includes(element.textContent))
           hLS.splice(hLS.indexOf(element.textContent), 1);
         else
           hLS.push(element.textContent);
-      });
-  }
+      }
+    });
   filterNodes();
 }
 
