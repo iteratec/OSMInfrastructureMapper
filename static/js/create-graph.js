@@ -6,7 +6,7 @@ let width,
   treeHeight,
   nOfLeafs,
   nOfLocations,
-  offsetHeight,
+  topOsmX,
 
   osmInfo,
   osmToLoc,
@@ -201,7 +201,8 @@ function drawScene() {
 
   const nOfWptInstances = hierarchyFiltered.Children.length;
   const treeLinks = tree.links();
-  offsetHeight = treeLinks.length ? treeLinks[0].target.x : 10;
+  topOsmX = nOfWptInstances ? treeLinks[0].target.x : 10;
+  bottomOsmX = nOfWptInstances ? treeLinks[nOfWptInstances - 1].target.x : 10;
   const descendants = dummyRoot.descendants();
 
   //Remove root node:
@@ -314,12 +315,17 @@ function drawScene() {
   agentNodes.attr("onmouseover", "markAgentNodes(this, true)")
     .attr("onmouseout", "markAgentNodes(this)");
 
+  const osmNames = d3.keys(osmInfo);
+  const nOfNames = osmNames.length;
+  const osmNodeDist = nOfNames > 1 ?
+    (bottomOsmX - topOsmX) / (nOfNames - 1) : 0;
+
   const osmNodes = svg.selectAll("node-osm")
-    .data(d3.keys(osmInfo))
+    .data(osmNames)
     .enter()
     .append("g")
     .attr("transform", (osm, i) =>
-      "translate(" + 0 + "," + (offsetHeight + 150 * i) + ")");
+      "translate(" + 0 + "," + (topOsmX + osmNodeDist * i) + ")");
 
   const osmTextNodes = osmNodes.append("text")
     .attr("class", "node node-osm")
@@ -354,7 +360,7 @@ function drawScene() {
       .attr("class", "link link-osm")
       .attr("d", d3.linkHorizontal()
         .x(d => d ? d.y - (d.nOfChildren ? wptTextWidth : wptTextWidth / 2) : 0)
-        .y(d => d ? d.x : offsetHeight + 150 * i))
+        .y(d => d ? d.x : topOsmX + osmNodeDist * i))
       .data(osmLinks.map(oL => ({
         sourceNode: curOsmNode,
         sourceName: osm,
