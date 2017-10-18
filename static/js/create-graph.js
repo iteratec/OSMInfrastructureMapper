@@ -243,8 +243,7 @@ function drawScene() {
   wptNodes.style("fill", d => d.data.Err ? red : null)
     .style("opacity", d => hiddenWptSubtrees.includes(d.data.Name) ?
       hiddenSubtreeOpacity : null);
-  agentNodes.style("fill",
-    d => d.data.LastCheck >= 30 || d.data.LastWork >= 120 ? orange : null);
+  agentNodes.style("fill", d => d.data.LastCheck >= 30 ? orange : null);
 
   const wptTextWidth = wptNodes
     .nodes().reduce((max, node) => Math.max(max, node.getBBox().width), 0);
