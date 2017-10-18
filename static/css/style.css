@@ -63,5 +63,6 @@ input:disabled+label {
 }
 
 #graph {
+  padding-top: 15px;
   margin-top: 1.2cm;
 }

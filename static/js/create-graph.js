@@ -184,6 +184,7 @@ function drawScene() {
 
   const osmTextWidth = 275;
   const agentTextWidth = 300;
+  const edgeSpacing = 7;
 
   //Subtract a constant from the window.innerWidth to compensate for the width
   //of the vertical scrollbar.
@@ -245,9 +246,9 @@ function drawScene() {
     .nodes().reduce((max, node) => Math.max(max, node.getBBox().width), 0);
 
   wptNodes.attr("transform", d =>
-    "translate(" + (d.y - wptTextWidth * 1 / 6) + "," + d.x + ")");
+    "translate(" + (d.y - wptTextWidth / 6) + "," + d.x + ")");
   locNodes.attr("transform", d =>
-    "translate(" + (d.y + locTextWidth * 1 / 6) + "," + d.x + ")");
+    "translate(" + (d.y + locTextWidth / 6) + "," + d.x + ")");
   agentNodes.attr("transform", d => "translate(" + d.y + "," + d.x + ")");
 
   agentNodes.append("title").text(d => "Last Check: " + d.data.LastCheck +
@@ -270,16 +271,24 @@ function drawScene() {
   //object.
   treeLinks.forEach((l, i, links) => {
     if (l.target.depth == 2) {
+      links[i].source.y +=
+        (wptTextWidth / 3 + edgeSpacing) / l.source.children.length;
       links[i].target = {
         data: l.target.data,
         x: l.target.x,
-        y: l.target.y - locTextWidth / 3,
+        y: l.target.y - locTextWidth / 3 - edgeSpacing,
         id: l.target.id,
       };
-      links[i].source.y += wptTextWidth / 3 / l.source.children.length;
     } else {
-      links[i].source.y += ((locTextWidthFiltered / 2) + (locTextWidth / 6)) /
+      links[i].source.y +=
+        (locTextWidthFiltered / 2 + locTextWidth / 6 + edgeSpacing) /
         l.source.children.length;
+      links[i].target = {
+        data: l.target.data,
+        x: l.target.x,
+        y: l.target.y - edgeSpacing,
+        id: l.target.id,
+      };
     }
   });
 
@@ -367,8 +376,8 @@ function drawScene() {
       .append("path")
       .attr("class", "link link-osm")
       .attr("d", d3.linkHorizontal()
-        .x(d => d ?
-          d.y - (d.nOfChildren ? wptTextWidth : wptTextWidth * 2 / 3) : 0)
+        .x(d => d ? d.y - (d.nOfChildren ? wptTextWidth + edgeSpacing * 2 :
+          wptTextWidth * 2 / 3 + edgeSpacing) : edgeSpacing)
         .y(d => d ? d.x : topOsmX + osmNodeDist * i))
       .data(osmLinks.map(oL => ({
         sourceNode: curOsmNode,
