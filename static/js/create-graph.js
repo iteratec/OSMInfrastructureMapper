@@ -185,8 +185,8 @@ function drawScene() {
   const osmTextWidth = 275;
   const agentTextWidth = 300;
 
-  //Subtract a constant from the window.innerWidth to compensate the width of
-  //the vertical scrollbar.
+  //Subtract a constant from the window.innerWidth to compensate for the width
+  //of the vertical scrollbar.
   width = window.innerWidth - 25;
   height = Math.max(window.innerHeight, nOfLeafs * 15);
   treeWidth = width - (osmTextWidth + agentTextWidth);
@@ -219,8 +219,7 @@ function drawScene() {
       id: "node" + i.toString(),
     })))
     .enter()
-    .append("g")
-    .attr("transform", d => "translate(" + d.y + "," + d.x + ")");
+    .append("g");
 
   const textNodes = nodes.append("text")
     .attr("class", (d, i) => "node " +
@@ -238,19 +237,25 @@ function drawScene() {
   const locNodes = textNodes.filter(".node-loc");
   const agentNodes = textNodes.filter(".node-agent");
 
-  agentNodes.append("title").text(d => "Last Check: " + d.data.LastCheck +
-    " min\n" + "Last Work: " + d.data.LastWork + " min");
-  wptNodes.style("fill", d => d.data.Err ? red : null)
-    .style("opacity", d => hiddenWptSubtrees.includes(d.data.Name) ?
-      hiddenSubtreeOpacity : null);
-  agentNodes.style("fill", d => d.data.LastCheck >= 30 ? orange : null);
-
   const wptTextWidth = wptNodes
     .nodes().reduce((max, node) => Math.max(max, node.getBBox().width), 0);
   const locTextWidth = locNodes
     .nodes().reduce((max, node) => Math.max(max, node.getBBox().width), 0);
   const locTextWidthFiltered = locNodes.filter(d => d.data.Children.length)
     .nodes().reduce((max, node) => Math.max(max, node.getBBox().width), 0);
+
+  wptNodes.attr("transform", d =>
+    "translate(" + (d.y - wptTextWidth * 1 / 6) + "," + d.x + ")");
+  locNodes.attr("transform", d =>
+    "translate(" + (d.y + locTextWidth * 1 / 6) + "," + d.x + ")");
+  agentNodes.attr("transform", d => "translate(" + d.y + "," + d.x + ")");
+
+  agentNodes.append("title").text(d => "Last Check: " + d.data.LastCheck +
+    " min\n" + "Last Work: " + d.data.LastWork + " min");
+  wptNodes.style("fill", d => d.data.Err ? red : null)
+    .style("opacity", d => hiddenWptSubtrees.includes(d.data.Name) ?
+      hiddenSubtreeOpacity : null);
+  agentNodes.style("fill", d => d.data.LastCheck >= 30 ? orange : null);
 
   if (showBrowsers)
     locNodes.attr("dx", -locTextWidth / 2);
@@ -264,16 +269,18 @@ function drawScene() {
   //the source variable of another link. That's why we need to create a new
   //object.
   treeLinks.forEach((l, i, links) => {
-    if (l.target.depth != 3)
+    if (l.target.depth == 2) {
       links[i].target = {
         data: l.target.data,
         x: l.target.x,
-        y: l.target.y - locTextWidth / 2,
+        y: l.target.y - locTextWidth / 3,
         id: l.target.id,
       };
-    links[i].source.y +=
-      (l.source.depth == 1 ? wptTextWidth : locTextWidthFiltered) /
-      2 / l.source.children.length;
+      links[i].source.y += wptTextWidth / 3 / l.source.children.length;
+    } else {
+      links[i].source.y += ((locTextWidthFiltered / 2) + (locTextWidth / 6)) /
+        l.source.children.length;
+    }
   });
 
   const links = svg.selectAll(".link")
@@ -360,7 +367,8 @@ function drawScene() {
       .append("path")
       .attr("class", "link link-osm")
       .attr("d", d3.linkHorizontal()
-        .x(d => d ? d.y - (d.nOfChildren ? wptTextWidth : wptTextWidth / 2) : 0)
+        .x(d => d ?
+          d.y - (d.nOfChildren ? wptTextWidth : wptTextWidth * 2 / 3) : 0)
         .y(d => d ? d.x : topOsmX + osmNodeDist * i))
       .data(osmLinks.map(oL => ({
         sourceNode: curOsmNode,
