@@ -81,7 +81,7 @@ function filterLocSubtree(element, event) {
 
 //Param highlight is false if the links should be unhighlighted, true otherwise.
 d3.selection.prototype.markLinks = function(highlight) {
-  const defaultNodeColor = "rgb(0, 0, 0)";
+  const defaultNodeColor = "rgb(47, 50, 58)";
   const iteratecMagentaDarkRgb = "rgb(115, 25, 100)";
   return this
     .style("stroke", highlight ? iteratecMagenta : null)
@@ -239,7 +239,7 @@ function drawScene() {
   const agentNodes = textNodes.filter(".node-agent");
 
   agentNodes.append("title").text(d => "Last Check: " + d.data.LastCheck +
-    "\n" + "Last Work: " + d.data.LastWork);
+    " min\n" + "Last Work: " + d.data.LastWork + " min");
   wptNodes.style("fill", d => d.data.Err ? red : null)
     .style("opacity", d => hiddenWptSubtrees.includes(d.data.Name) ?
       hiddenSubtreeOpacity : null);
@@ -380,7 +380,7 @@ function filterNodes() {
   const filterNodes = document.getElementById("filterNodes").elements;
   showBrowsers = filterNodes.showBrowsers.checked;
 
-  filterNodes.hideOffline.disabled = showBrowsers;
+  filterNodes.showOffline.disabled = showBrowsers;
 
   //Copy assignment
   hierarchyFiltered = JSON.parse(JSON.stringify(
@@ -392,7 +392,7 @@ function filterNodes() {
     wpts[i].Children = wpts[i].Children.filter(loc =>
       !hiddenWptSubtrees.includes(wpt.Name) &&
       loc.Name.toLowerCase().includes(filterText.loc.value.toLowerCase()) &&
-      (!filterNodes.hideOffline.checked || !loc.Offline));
+      (filterNodes.showOffline.checked || !loc.Offline));
     wpts[i].Children.forEach((loc, j, locs) => locs[j].Children =
       loc.Children.filter(agent => !hLS.includes(loc.Name) &&
         agent.Name.toLowerCase().includes(filterText.agent.value.toLowerCase()))

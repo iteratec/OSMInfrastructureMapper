@@ -3,6 +3,7 @@
 
 <head>
   <title>OSMIM - OpenSpeedMonitor Infrastructure Mapper</title>
+  <link rel="stylesheet" type="text/css" href="css/spectre.min.css">
   <link rel="stylesheet" type="text/css" href="css/style.css">
   <script src="js/d3.v4.min.js"></script>
 </head>
@@ -10,13 +11,13 @@
 <body>
   <span id="filter">
     <form id="filterNodes">
-      <input name="hideOffline" type="checkbox" onchange="filterNodes()" checked/>
-      <label for="hideOffline">
-        Hide locations without testers.
+      <input name="showOffline" type="checkbox" onchange="filterNodes()"/>
+      <label for="showOffline">
+        Show locations without testers
       </label>
       <input name="showBrowsers" type="checkbox" onchange="filterNodes()"/>
       <label for="showBrowsers">
-        Show browsers instead of agents.
+        Show browsers
       </label>
     </form>
     <form oninput="filterNodes()" id="filterByText">
