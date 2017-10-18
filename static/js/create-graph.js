@@ -182,7 +182,7 @@ function drawScene() {
   document.getElementById("legend").className = "hidden";
   d3.select("svg").selectAll("*").remove();
 
-  const osmTextWidth = 275;
+  const osmTextWidth = 320;
   const agentTextWidth = 300;
   const edgeSpacing = 7;
 

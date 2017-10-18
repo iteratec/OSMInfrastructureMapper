@@ -8,16 +8,11 @@ body {
   src: url("/fonts/Karmilla-Regular-015.ttf");
 }
 
-form button, form label {
-  font-size: 14px;
-}
-
 form button, form label, .node {
   font-family: "karmilla-regular", sans-serif;
 }
 
 .node {
-  font-size: 14px;
   cursor: default;
   fill: #2f323a;
 }
