@@ -392,27 +392,46 @@ function drawScene() {
 }
 
 function filterNodes() {
-  const filterText = document.getElementById("filterByText").elements;
   const filterNodes = document.getElementById("filterNodes").elements;
-  showBrowsers = filterNodes.showBrowsers.checked;
+  const showBrowsers = filterNodes.showBrowsers.checked;
+  const substring = filterNodes.filterSubstring.value.toLowerCase();
 
   filterNodes.showOffline.disabled = showBrowsers;
 
   //Copy assignment
   hierarchyFiltered = JSON.parse(JSON.stringify(
     showBrowsers ? browserHierarchy : hierarchyOrig));
-  hierarchyFiltered.Children = hierarchyFiltered.Children.filter(wpt =>
-    wpt.Name.toLowerCase().includes(filterText.wpt.value.toLowerCase()));
+
   hierarchyFiltered.Children.forEach((wpt, i, wpts) => {
     const hLS = hiddenLocSubtrees.get(wpt.Name);
-    wpts[i].Children = wpts[i].Children.filter(loc =>
+
+    wpts[i].Children = wpt.Children.filter(loc =>
       !hiddenWptSubtrees.includes(wpt.Name) &&
-      loc.Name.toLowerCase().includes(filterText.loc.value.toLowerCase()) &&
       (filterNodes.showOffline.checked || !loc.Offline));
+
     wpts[i].Children.forEach((loc, j, locs) => locs[j].Children =
-      loc.Children.filter(agent => !hLS.includes(loc.Name) &&
-        agent.Name.toLowerCase().includes(filterText.agent.value.toLowerCase()))
-    );
+      loc.Children.filter(agent => !hLS.includes(loc.Name)));
+  });
+
+  hierarchyFiltered.Children = hierarchyFiltered.Children.filter(wpt =>
+    wpt.Name.toLowerCase().includes(substring) ||
+    wpt.Children.reduce((locIncluded, loc) => locIncluded ||
+      loc.Name.toLowerCase().includes(substring) ||
+      loc.Children.reduce((agentIncluded, agent) => agentIncluded ||
+        agent.Name.toLowerCase().includes(substring), false), false));
+
+  hierarchyFiltered.Children.forEach((wpt, i, wpts) => {
+    wpts[i].Children = wpt.Children.filter(loc =>
+      wpt.Name.toLowerCase().includes(substring) ||
+      loc.Name.toLowerCase().includes(substring) ||
+      loc.Children.reduce((agentIncluded, agent) => agentIncluded ||
+        agent.Name.toLowerCase().includes(substring), false));
+
+    wpts[i].Children.forEach((loc, j, locs) => locs[j].Children =
+      loc.Children.filter(agent =>
+        wpt.Name.toLowerCase().includes(substring) ||
+        loc.Name.toLowerCase().includes(substring) ||
+        agent.Name.toLowerCase().includes(substring)));
   });
 
   osmToLoc = new Map();

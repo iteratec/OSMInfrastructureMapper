@@ -19,11 +19,7 @@
       <label for="showBrowsers">
         Show browsers
       </label>
-    </form>
-    <form oninput="filterNodes()" id="filterByText">
-      <label>WPT instances: <input name="wpt" type="text "></label>
-      <label>Locations: <input name="loc" type="text "></label>
-      <label>Agents: <input name="agent" type="text "></label>
+      <label>Filter by substring: <input name="filterSubstring" type="text" oninput="filterNodes()"></label>
     </form>
   </span>
   <svg id="graph" />
