@@ -23,6 +23,8 @@ let width,
 const iteratecBlue = "#008cd2",
   iteratecBlueLight = "#91c3e6",
   iteratecBlueLighter = "#cde6f5",
+  kobaltBlau = "#3732f5",
+  kobaltBlauDarker = "#00197d",
   iteratecGrayBlue = "#d7e1eb",
   iteratecMagentaDark = "#731964",
   iteratecMagenta = "#a92183",
@@ -394,9 +396,23 @@ function drawScene() {
 function filterNodes() {
   const filterNodes = document.getElementById("filterNodes").elements;
   const showBrowsers = filterNodes.showBrowsers.checked;
+  const showOffline = filterNodes.showOffline.checked;
+  const showBrowsersLabel = document.getElementById("showBrowsersLabel");
+  const showOfflineLabel = document.getElementById("showOfflineLabel");
   const substring = filterNodes.filterSubstring.value.toLowerCase();
 
-  filterNodes.showOffline.disabled = showBrowsers;
+  if (showBrowsers) {
+    showBrowsersLabel.classList.add("active");
+    showOfflineLabel.classList.add("disabled");
+  } else {
+    showOfflineLabel.classList.remove("disabled");
+    showBrowsersLabel.classList.remove("active");
+  }
+  if (showOffline) {
+    showOfflineLabel.classList.add("active");
+  } else {
+    showOfflineLabel.classList.remove("active");
+  }
 
   //Copy assignment
   hierarchyFiltered = JSON.parse(JSON.stringify(
@@ -406,8 +422,7 @@ function filterNodes() {
     const hLS = hiddenLocSubtrees.get(wpt.Name);
 
     wpts[i].Children = wpt.Children.filter(loc =>
-      !hiddenWptSubtrees.includes(wpt.Name) &&
-      (filterNodes.showOffline.checked || !loc.Offline));
+      !hiddenWptSubtrees.includes(wpt.Name) && (showOffline || !loc.Offline));
 
     wpts[i].Children.forEach((loc, j, locs) => locs[j].Children =
       loc.Children.filter(agent => !hLS.includes(loc.Name)));

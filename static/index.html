@@ -11,15 +11,15 @@
 <body>
   <span id="filter">
     <form id="filterNodes">
+      <label id="showOfflineLabel" class="btn">
       <input name="showOffline" type="checkbox" onchange="filterNodes()"/>
-      <label for="showOffline">
-        Show locations without testers
+        Locations without testers
       </label>
+      <label id="showBrowsersLabel" class="btn">
       <input name="showBrowsers" type="checkbox" onchange="filterNodes()"/>
-      <label for="showBrowsers">
-        Show browsers
+        Browsers
       </label>
-      <label>Filter by substring: <input name="filterSubstring" type="text" oninput="filterNodes()"></label>
+      <input name="filterSubstring" type="text" oninput="filterNodes()" placeholder="Filter by substring">
     </form>
   </span>
   <svg id="graph" />

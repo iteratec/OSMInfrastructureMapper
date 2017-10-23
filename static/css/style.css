@@ -1,15 +1,31 @@
-body {
-  margin: 15px !important;
-  color: #2f323a;
-}
-
 @font-face {
   font-family: "karmilla-regular";
   src: url("/fonts/Karmilla-Regular-015.ttf");
 }
 
-form button, form label, .node {
+body {
   font-family: "karmilla-regular", sans-serif;
+  margin: 15px !important;
+  color: #2f323a;
+}
+
+.btn.active {
+  background: #00e;
+  border-color: #3732f5;
+}
+
+.btn.active:hover {
+  color: #fff;
+}
+
+.btn:hover {
+  border-color: #00e;
+  color: #00e;
+}
+
+.btn {
+  border: .05rem solid #3732f5;
+  color: #3732f5;
 }
 
 .node {
@@ -43,8 +59,8 @@ form button, form label, .node {
   opacity: 0.4;
 }
 
-input:disabled+label {
-  color: #848484
+label input[type=checkbox] {
+  display: none;
 }
 
 #filter {
