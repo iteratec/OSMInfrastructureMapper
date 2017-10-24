@@ -49,7 +49,6 @@ let width,
   hierarchyOrig,
   hierarchyFiltered,
   browserHierarchy,
-  showBrowsers,
   tree,
   dummyRoot;
 
@@ -240,8 +239,7 @@ function drawScene() {
         i < nOfWptInstances + nOfLocations ? "node-loc" : "node-agent"))
     .attr("id", (d, i) => "node" + i.toString())
     .attr("dy", 3)
-    .style("text-anchor", d => d.depth == 3 || (showBrowsers && d.depth == 2) ?
-      "start" : "middle")
+    .style("text-anchor", d => d.depth == 3 ? "start" : "middle")
     .text(d => d.data.Name);
 
   nodes.append("title").text(d => d.data.URL);
@@ -269,9 +267,6 @@ function drawScene() {
     .style("opacity", d => hiddenWptSubtrees.includes(d.data.Name) ?
       hiddenSubtreeOpacity : null);
   agentNodes.style("fill", d => d.data.LastCheck >= 30 ? orange : null);
-
-  if (showBrowsers)
-    locNodes.attr("dx", -locTextWidth / 2);
 
   treeLinks.forEach((l, i, links) => {
     links[i].target.id = "node" + i.toString();
