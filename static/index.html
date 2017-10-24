@@ -9,19 +9,23 @@
 </head>
 
 <body>
-  <span id="filter">
-    <form id="filterNodes">
-      <label id="showOfflineLabel" class="btn">
-      <input name="showOffline" type="checkbox" onchange="filterNodes()"/>
-        Locations without testers
-      </label>
-      <label id="showBrowsersLabel" class="btn">
-      <input name="showBrowsers" type="checkbox" onchange="filterNodes()"/>
-        Browsers
-      </label>
-      <input name="filterSubstring" type="text" oninput="filterNodes()" placeholder="Filter by substring">
-    </form>
-  </span>
+  <div id=header>
+    <h2>OSM Infrastructure Mapper</h2>
+    <span id="filter">
+      <form id="filterNodes">
+        <label id="showOfflineLabel" class="btn">
+          <input name="showOffline" type="checkbox" onchange="filterNodes()"/>
+          Locations without testers
+        </label>
+        <label id="showBrowsersLabel" class="btn">
+          <input name="showBrowsers" type="checkbox" onchange="filterNodes()"/>
+          Browsers
+        </label>
+        <input name="filterSubstring" type="text" oninput="filterNodes()" placeholder="Filter by substring">
+      </form>
+    </span>
+  </div>
+
   <svg id="graph" />
 
   <div id="legend" class="hidden">
