@@ -12,17 +12,16 @@
   <div id=header>
     <h2>OSM Infrastructure Mapper</h2>
     <span id="filter">
-      <form id="filterNodes">
-        <label id="showOfflineLabel" class="btn">
-          <input name="showOffline" type="checkbox" onchange="filter()"/>
-          Locations without testers
-        </label>
-        <label id="showBrowsersLabel" class="btn">
-          <input name="showBrowsers" type="checkbox" onchange="filter()"/>
-          Browsers
-        </label>
-        <input name="filterSubstring" type="text" oninput="filter()" placeholder="Filter by substring">
-      </form>
+      <btn id="collapseAll" class="btn disabled" onclick="collapse()">Collapse all</btn>
+      <label id="showOfflineLabel" class="btn">
+        <input id="showOffline" type="checkbox" onchange="filter()"/>
+        Locations without testers
+      </label>
+      <label id="showBrowsersLabel" class="btn">
+        <input id="showBrowsers" type="checkbox" onchange="filter()"/>
+        Browsers
+      </label>
+      <input id="filterSubstring" type="text" oninput="filter()" placeholder="Filter by substring">
     </span>
   </div>
 

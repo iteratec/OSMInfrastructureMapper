@@ -10,9 +10,12 @@ const osmTextWidth = 320,
   defaultNodeColor = "rgb(47, 50, 58)",
   iteratecMagentaDarkRgb = "rgb(115, 25, 100)",
 
-  filterNodes = document.getElementById("filterNodes").elements,
   browsersLabelClasses = document.getElementById("showBrowsersLabel").classList,
   offlineLabelClasses = document.getElementById("showOfflineLabel").classList,
+  showOffline = document.getElementById("showOffline"),
+  showBrowsers = document.getElementById("showBrowsers"),
+  filterSubstring = document.getElementById("filterSubstring"),
+  collapseAll = document.getElementById("collapseAll"),
 
   iteratecBlue = "#008cd2",
   iteratecBlueLight = "#91c3e6",
@@ -52,9 +55,21 @@ let width,
   hierarchyOrig,
   hierarchyFiltered,
   browserHierarchy,
-  showBrowsers,
   tree,
   dummyRoot;
+
+function collapse() {
+  //Wpt text labels are unique, so every wpt node can be unambiguously
+  //identified by its label. Location labels are however not unique. That's
+  //why we identify location nodes in the map hiddenLocSubtrees by
+  //storing the hidden location labels array as the value of its parent wpt
+  //node, which is the key.
+  hiddenWptSubtrees = ["www.webpagetest.org"];
+  hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
+    wpt => [wpt.Name, []]));
+
+  filter();
+}
 
 function filterWptSubtree(element, event) {
   if (event.ctrlKey) {
@@ -209,9 +224,9 @@ function drawScene() {
   treeWidth = width - (osmTextWidth + leafTextWidth);
   treeHeight = height - 100;
 
-  if (!nOfAgents && (!showBrowsers || !nOfLocations)) {
+  if (!nOfAgents && (!showBrowsers.checked || !nOfLocations)) {
     treeWidth -= leafTextWidth;
-    if (!showBrowsers && !nOfLocations) {
+    if (!showBrowsers.checked && !nOfLocations) {
       treeWidth /= 2;
     }
   }
@@ -408,18 +423,27 @@ function drawScene() {
 }
 
 function filter() {
-  const showOffline = filterNodes.showOffline.checked;
-  const substring = filterNodes.filterSubstring.value.toLowerCase();
-  showBrowsers = filterNodes.showBrowsers.checked;
+  const browsers = showBrowsers.checked;
+  const offline = showOffline.checked;
+  const substring = filterSubstring.value.toLowerCase();
 
-  if (showBrowsers) {
+  if ((!hiddenWptSubtrees.length || (hiddenWptSubtrees.length == 1 &&
+      hiddenWptSubtrees[0] == "www.webpagetest.org")) &&
+    !Array.from(hiddenLocSubtrees.values()).reduce(
+      (hidden, locs) => hidden || locs.length, false)) {
+    collapseAll.classList.add("disabled");
+  } else {
+    collapseAll.classList.remove("disabled");
+  }
+
+  if (browsers) {
     browsersLabelClasses.add("active");
     offlineLabelClasses.add("disabled");
   } else {
     offlineLabelClasses.remove("disabled");
     browsersLabelClasses.remove("active");
   }
-  if (showOffline) {
+  if (offline) {
     offlineLabelClasses.add("active");
   } else {
     offlineLabelClasses.remove("active");
@@ -427,15 +451,15 @@ function filter() {
 
   //Copy assignment
   hierarchyFiltered = JSON.parse(JSON.stringify(
-    showBrowsers ? browserHierarchy : hierarchyOrig));
+    browsers ? browserHierarchy : hierarchyOrig));
 
-  leafTextWidth = showBrowsers ? browserTextWidth : agentTextWidth;
+  leafTextWidth = browsers ? browserTextWidth : agentTextWidth;
 
   hierarchyFiltered.Children.forEach((wpt, i, wpts) => {
     const hLS = hiddenLocSubtrees.get(wpt.Name);
 
     wpts[i].Children = wpt.Children.filter(loc =>
-      !hiddenWptSubtrees.includes(wpt.Name) && (showOffline || !loc.Offline));
+      !hiddenWptSubtrees.includes(wpt.Name) && (offline || !loc.Offline));
 
     wpts[i].Children.forEach((loc, j, locs) => locs[j].Children =
       loc.Children.filter(agent => !hLS.includes(loc.Name)));
@@ -463,14 +487,14 @@ function filter() {
   });
 
   osmToLoc = new Map();
-  osmNames.forEach(osm => osmToLoc[osm] = showBrowsers ?
+  osmNames.forEach(osm => osmToLoc[osm] = browsers ?
     osmInfo[osm].Browsers : osmInfo[osm].Locs);
   dummyRoot = d3.hierarchy(hierarchyFiltered, d => d.Children);
   dummyRoot.sort((lhs, rhs) => lhs.data.Name.localeCompare(rhs.data.Name));
   nOfWptInstances = hierarchyFiltered.Children.length;
   nOfLocations = hierarchyFiltered.Children.reduce(
     (sum, wpt) => sum + wpt.Children.length, 0);
-  nOfAgents = showBrowsers ? 0 : hierarchyFiltered.Children.reduce(
+  nOfAgents = browsers ? 0 : hierarchyFiltered.Children.reduce(
     (sum, wpt) => sum + wpt.Children.reduce(
       (agentSum, loc) => agentSum + loc.Children.length, 0), 0);
   nOfLeafs = dummyRoot.descendants().reduce(
@@ -486,15 +510,6 @@ d3.json("getData", data => {
   osmNames = Object.keys(osmInfo);
   nOfOsmInstances = osmNames.length;
 
-  //Wpt text labels are unique, so every wpt node can be unambiguously
-  //identified by its label. Location labels are however not unique. That's
-  //why we identify location nodes in the map hiddenLocSubtrees by
-  //storing the hidden location labels array as the value of its parent wpt
-  //node, which is the key.
-  hiddenWptSubtrees = ["www.webpagetest.org"];
-  hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
-    wpt => [wpt.Name, []]));
-
-  filter();
+  collapse();
   window.addEventListener('resize', drawScene);
 });
