@@ -2,6 +2,7 @@
 
 const osmTextWidth = 320,
   agentTextWidth = 300,
+  browserTextWidth = 400,
   edgeSpacing = 7,
 
   hiddenSubtreeOpacity = 0.4,
@@ -34,6 +35,7 @@ let width,
   height,
   treeWidth,
   treeHeight,
+  leafTextWidth,
   nOfOsmInstances,
   nOfWptInstances,
   nOfLeafs,
@@ -202,7 +204,7 @@ function drawScene() {
   //of the vertical scrollbar.
   width = window.innerWidth - 25;
   height = Math.max(window.innerHeight, nOfLeafs * 15);
-  treeWidth = width - (osmTextWidth + agentTextWidth);
+  treeWidth = width - (osmTextWidth + leafTextWidth);
   treeHeight = height - 100;
 
   const svg = d3.select("svg")
@@ -417,6 +419,8 @@ function filter() {
   //Copy assignment
   hierarchyFiltered = JSON.parse(JSON.stringify(
     showBrowsers ? browserHierarchy : hierarchyOrig));
+
+  leafTextWidth = showBrowsers ? browserTextWidth : agentTextWidth;
 
   hierarchyFiltered.Children.forEach((wpt, i, wpts) => {
     const hLS = hiddenLocSubtrees.get(wpt.Name);
