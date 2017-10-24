@@ -38,6 +38,7 @@ let width,
   leafTextWidth,
   nOfOsmInstances,
   nOfWptInstances,
+  nOfAgents,
   nOfLeafs,
   nOfLocations,
   topOsmX,
@@ -51,6 +52,7 @@ let width,
   hierarchyOrig,
   hierarchyFiltered,
   browserHierarchy,
+  showBrowsers,
   tree,
   dummyRoot;
 
@@ -206,6 +208,13 @@ function drawScene() {
   height = Math.max(window.innerHeight, nOfLeafs * 15);
   treeWidth = width - (osmTextWidth + leafTextWidth);
   treeHeight = height - 100;
+
+  if (!nOfAgents && (!showBrowsers || !nOfLocations)) {
+    treeWidth -= leafTextWidth;
+    if (!showBrowsers && !nOfLocations) {
+      treeWidth /= 2;
+    }
+  }
 
   const svg = d3.select("svg")
     .attr("width", width)
@@ -399,9 +408,9 @@ function drawScene() {
 }
 
 function filter() {
-  const showBrowsers = filterNodes.showBrowsers.checked;
   const showOffline = filterNodes.showOffline.checked;
   const substring = filterNodes.filterSubstring.value.toLowerCase();
+  showBrowsers = filterNodes.showBrowsers.checked;
 
   if (showBrowsers) {
     browsersLabelClasses.add("active");
@@ -461,6 +470,9 @@ function filter() {
   nOfWptInstances = hierarchyFiltered.Children.length;
   nOfLocations = hierarchyFiltered.Children.reduce(
     (sum, wpt) => sum + wpt.Children.length, 0);
+  nOfAgents = showBrowsers ? 0 : hierarchyFiltered.Children.reduce(
+    (sum, wpt) => sum + wpt.Children.reduce(
+      (agentSum, loc) => agentSum + loc.Children.length, 0), 0);
   nOfLeafs = dummyRoot.descendants().reduce(
     (sum, wpt) => sum + (wpt.children ? 0 : 1), 0);
 
