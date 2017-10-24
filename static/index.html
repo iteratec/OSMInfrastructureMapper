@@ -14,14 +14,14 @@
     <span id="filter">
       <form id="filterNodes">
         <label id="showOfflineLabel" class="btn">
-          <input name="showOffline" type="checkbox" onchange="filterNodes()"/>
+          <input name="showOffline" type="checkbox" onchange="filter()"/>
           Locations without testers
         </label>
         <label id="showBrowsersLabel" class="btn">
-          <input name="showBrowsers" type="checkbox" onchange="filterNodes()"/>
+          <input name="showBrowsers" type="checkbox" onchange="filter()"/>
           Browsers
         </label>
-        <input name="filterSubstring" type="text" oninput="filterNodes()" placeholder="Filter by substring">
+        <input name="filterSubstring" type="text" oninput="filter()" placeholder="Filter by substring">
       </form>
     </span>
   </div>

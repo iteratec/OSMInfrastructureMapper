@@ -1,26 +1,19 @@
 /*jshint esversion: 6 */
 
-let width,
-  height,
-  treeWidth,
-  treeHeight,
-  nOfLeafs,
-  nOfLocations,
-  topOsmX,
+const osmTextWidth = 320,
+  agentTextWidth = 300,
+  edgeSpacing = 7,
 
-  osmInfo,
-  osmToLoc,
+  hiddenSubtreeOpacity = 0.4,
 
-  hiddenWptSubtrees,
-  hiddenLocSubtrees,
-  hierarchyOrig,
-  hierarchyFiltered,
-  browserHierarchy,
-  showBrowsers,
-  tree,
-  dummyRoot;
+  defaultNodeColor = "rgb(47, 50, 58)",
+  iteratecMagentaDarkRgb = "rgb(115, 25, 100)",
 
-const iteratecBlue = "#008cd2",
+  filterNodes = document.getElementById("filterNodes").elements,
+  browsersLabelClasses = document.getElementById("showBrowsersLabel").classList,
+  offlineLabelClasses = document.getElementById("showOfflineLabel").classList,
+
+  iteratecBlue = "#008cd2",
   iteratecBlueLight = "#91c3e6",
   iteratecBlueLighter = "#cde6f5",
   kobaltBlau = "#3732f5",
@@ -35,8 +28,30 @@ const iteratecBlue = "#008cd2",
   osmGray = "#2f323a",
   osmGrayDarker = "#989dad",
   orange = "#ff7800",
-  red = "#f01715",
-  hiddenSubtreeOpacity = 0.4;
+  red = "#f01715";
+
+let width,
+  height,
+  treeWidth,
+  treeHeight,
+  nOfOsmInstances,
+  nOfWptInstances,
+  nOfLeafs,
+  nOfLocations,
+  topOsmX,
+
+  osmInfo,
+  osmToLoc,
+  osmNames,
+
+  hiddenWptSubtrees,
+  hiddenLocSubtrees,
+  hierarchyOrig,
+  hierarchyFiltered,
+  browserHierarchy,
+  showBrowsers,
+  tree,
+  dummyRoot;
 
 function filterWptSubtree(element, event) {
   if (event.ctrlKey) {
@@ -49,7 +64,7 @@ function filterWptSubtree(element, event) {
     else
       hiddenWptSubtrees.push(element.textContent);
   }
-  filterNodes();
+  filter();
 }
 
 function filterLocSubtree(element, event) {
@@ -78,13 +93,11 @@ function filterLocSubtree(element, event) {
           hLS.push(element.textContent);
       }
     });
-  filterNodes();
+  filter();
 }
 
 //Param highlight is false if the links should be unhighlighted, true otherwise.
 d3.selection.prototype.markLinks = function(highlight) {
-  const defaultNodeColor = "rgb(47, 50, 58)";
-  const iteratecMagentaDarkRgb = "rgb(115, 25, 100)";
   return this
     .style("stroke", highlight ? iteratecMagenta : null)
     .style("stroke-width", highlight ? 1.5 : null)
@@ -181,12 +194,10 @@ function markAgentNodes(element, highlight) {
 }
 
 function drawScene() {
+  //Avoid jumping of the legend from the top to the bottom by hiding it until
+  //the graph is rendered:
   document.getElementById("legend").className = "hidden";
   d3.select("svg").selectAll("*").remove();
-
-  const osmTextWidth = 320;
-  const agentTextWidth = 300;
-  const edgeSpacing = 7;
 
   //Subtract a constant from the window.innerWidth to compensate for the width
   //of the vertical scrollbar.
@@ -201,10 +212,9 @@ function drawScene() {
     .append("g")
     .attr("transform", "translate(" + osmTextWidth + "," + 0 + ")");
 
-  // bl.ocks.org/mbostock/4339184
+  //bl.ocks.org/mbostock/4339184
   tree = d3.tree().size([treeHeight, treeWidth])(dummyRoot);
 
-  const nOfWptInstances = hierarchyFiltered.Children.length;
   const treeLinks = tree.links();
   topOsmX = nOfWptInstances > 1 ? treeLinks[0].target.x : 50;
   bottomOsmX = nOfWptInstances > 1 ? treeLinks[nOfWptInstances - 1].target.x : window.innerHeight - 150;
@@ -334,10 +344,8 @@ function drawScene() {
   agentNodes.attr("onmouseover", "markAgentNodes(this, true)")
     .attr("onmouseout", "markAgentNodes(this)");
 
-  const osmNames = d3.keys(osmInfo);
-  const nOfNames = osmNames.length;
-  const osmNodeDist = nOfNames > 1 ?
-    (bottomOsmX - topOsmX) / (nOfNames - 1) : 0;
+  const osmNodeDist = nOfOsmInstances > 1 ?
+    (bottomOsmX - topOsmX) / (nOfOsmInstances - 1) : 0;
 
   const osmNodes = svg.selectAll("node-osm")
     .data(osmNames)
@@ -357,7 +365,7 @@ function drawScene() {
 
   osmNodes.append("title").text(osm => osmInfo[osm].URL);
 
-  d3.keys(osmInfo).forEach((osm, i) => {
+  osmNames.forEach((osm, i) => {
     const osmLinks = !tree.children ? [] : tree.children
       .filter(node => osmInfo[osm].Wpts.includes(node.data.URL))
       .map(wptNode => ({
@@ -393,25 +401,22 @@ function drawScene() {
   document.getElementById("legend").className = null;
 }
 
-function filterNodes() {
-  const filterNodes = document.getElementById("filterNodes").elements;
+function filter() {
   const showBrowsers = filterNodes.showBrowsers.checked;
   const showOffline = filterNodes.showOffline.checked;
-  const showBrowsersLabel = document.getElementById("showBrowsersLabel");
-  const showOfflineLabel = document.getElementById("showOfflineLabel");
   const substring = filterNodes.filterSubstring.value.toLowerCase();
 
   if (showBrowsers) {
-    showBrowsersLabel.classList.add("active");
-    showOfflineLabel.classList.add("disabled");
+    browsersLabelClasses.add("active");
+    offlineLabelClasses.add("disabled");
   } else {
-    showOfflineLabel.classList.remove("disabled");
-    showBrowsersLabel.classList.remove("active");
+    offlineLabelClasses.remove("disabled");
+    browsersLabelClasses.remove("active");
   }
   if (showOffline) {
-    showOfflineLabel.classList.add("active");
+    offlineLabelClasses.add("active");
   } else {
-    showOfflineLabel.classList.remove("active");
+    offlineLabelClasses.remove("active");
   }
 
   //Copy assignment
@@ -450,26 +455,25 @@ function filterNodes() {
   });
 
   osmToLoc = new Map();
-  Object.keys(osmInfo).forEach(osm => osmToLoc[osm] = showBrowsers ?
+  osmNames.forEach(osm => osmToLoc[osm] = showBrowsers ?
     osmInfo[osm].Browsers : osmInfo[osm].Locs);
-
-  prepareHierarchy();
-  drawScene();
-}
-
-function prepareHierarchy() {
   dummyRoot = d3.hierarchy(hierarchyFiltered, d => d.Children);
   dummyRoot.sort((lhs, rhs) => lhs.data.Name.localeCompare(rhs.data.Name));
+  nOfWptInstances = hierarchyFiltered.Children.length;
   nOfLocations = hierarchyFiltered.Children.reduce(
     (sum, wpt) => sum + wpt.Children.length, 0);
   nOfLeafs = dummyRoot.descendants().reduce(
     (sum, wpt) => sum + (wpt.children ? 0 : 1), 0);
+
+  drawScene();
 }
 
 d3.json("getData", data => {
   osmInfo = data.OsmToInfo;
   hierarchyOrig = data.Hierarchy;
   browserHierarchy = data.BrowserHierarchy;
+  osmNames = Object.keys(osmInfo);
+  nOfOsmInstances = osmNames.length;
 
   //Wpt text labels are unique, so every wpt node can be unambiguously
   //identified by its label. Location labels are however not unique. That's
@@ -480,6 +484,6 @@ d3.json("getData", data => {
   hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
     wpt => [wpt.Name, []]));
 
-  filterNodes();
+  filter();
   window.addEventListener('resize', drawScene);
 });
