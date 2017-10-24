@@ -206,8 +206,8 @@ function drawScene() {
 
   const nOfWptInstances = hierarchyFiltered.Children.length;
   const treeLinks = tree.links();
-  topOsmX = nOfWptInstances ? treeLinks[0].target.x : 10;
-  bottomOsmX = nOfWptInstances ? treeLinks[nOfWptInstances - 1].target.x : 10;
+  topOsmX = nOfWptInstances > 1 ? treeLinks[0].target.x : 50;
+  bottomOsmX = nOfWptInstances > 1 ? treeLinks[nOfWptInstances - 1].target.x : window.innerHeight - 150;
   const descendants = dummyRoot.descendants();
 
   //Remove root node:
