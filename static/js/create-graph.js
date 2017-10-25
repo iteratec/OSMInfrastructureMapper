@@ -71,18 +71,27 @@ function collapse() {
   filter();
 }
 
-function filterWptSubtree(element, event) {
+function filterWptSubtree(element, event, noCollapse) {
   if (event.ctrlKey) {
-    hiddenWptSubtrees = hierarchyOrig.Children
-      .filter(wpt => wpt.Name != element.textContent).map(wpt => wpt.Name);
+    if (!noCollapse && hiddenWptSubtrees.length == nOfWptInstances - 1 &&
+      !hiddenWptSubtrees.includes(element.textContent) &&
+      !hiddenLocSubtrees.get(element.textContent).length) {
+      collapse();
+    } else {
+      hiddenWptSubtrees = hierarchyOrig.Children
+        .filter(wpt => wpt.Name != element.textContent).map(wpt => wpt.Name);
+      hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
+        wpt => [wpt.Name, []]));
+      filter();
+    }
   } else {
     if (hiddenWptSubtrees.includes(element.textContent))
       hiddenWptSubtrees.splice(
         hiddenWptSubtrees.indexOf(element.textContent), 1);
     else
       hiddenWptSubtrees.push(element.textContent);
+    filter();
   }
-  filter();
 }
 
 function filterLocSubtree(element, event) {
@@ -90,28 +99,34 @@ function filterLocSubtree(element, event) {
     .filter(link => link.targetId == element.id)
     .each(link => {
       if (event.ctrlKey) {
-        const wptSource = {
-          textContent: link.sourceName
-        };
-        hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
+        const subtreesToHide = new Map(hierarchyOrig.Children.map(
           wpt => [wpt.Name, []]));
-
-        filterWptSubtree(wptSource, event);
         hierarchyOrig.Children
-          .filter(wpt => wpt.Name == wptSource.textContent)
-          .forEach(wpt =>
+          .filter(wpt => wpt.Name == link.sourceName).forEach(wpt =>
             wpt.Children.filter(loc => loc.Name != element.textContent)
             .forEach(loc =>
-              hiddenLocSubtrees.get(wptSource.textContent).push(loc.Name)));
+              subtreesToHide.get(link.sourceName).push(loc.Name)));
+        if (hiddenLocSubtrees.get(link.sourceName).length ==
+          subtreesToHide.get(link.sourceName).length &&
+          !hiddenLocSubtrees.get(link.sourceName).includes(
+            element.textContent)) {
+          collapse();
+        } else {
+          filterWptSubtree({
+            textContent: link.sourceName
+          }, event, true);
+          hiddenLocSubtrees = subtreesToHide;
+          filter();
+        }
       } else {
         const hLS = hiddenLocSubtrees.get(link.sourceName);
         if (hLS.includes(element.textContent))
           hLS.splice(hLS.indexOf(element.textContent), 1);
         else
           hLS.push(element.textContent);
+        filter();
       }
     });
-  filter();
 }
 
 //Param highlight is false if the links should be unhighlighted, true otherwise.
