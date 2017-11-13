@@ -72,7 +72,7 @@ label input[type=checkbox] {
   left: 0;
   right: 0;
   padding: 15px;
-  padding-bottom: 0px;
+  padding-bottom: 0;
 }
 
 #filter {

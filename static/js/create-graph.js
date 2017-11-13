@@ -73,13 +73,13 @@ function collapse() {
 
 function filterWptSubtree(element, event, noCollapse) {
   if (event.ctrlKey) {
-    if (!noCollapse && hiddenWptSubtrees.length == nOfWptInstances - 1 &&
+    if (!noCollapse && hiddenWptSubtrees.length === nOfWptInstances - 1 &&
       !hiddenWptSubtrees.includes(element.textContent) &&
       !hiddenLocSubtrees.get(element.textContent).length) {
       collapse();
     } else {
       hiddenWptSubtrees = hierarchyOrig.Children
-        .filter(wpt => wpt.Name != element.textContent).map(wpt => wpt.Name);
+        .filter(wpt => wpt.Name !== element.textContent).map(wpt => wpt.Name);
       hiddenLocSubtrees = new Map(hierarchyOrig.Children.map(
         wpt => [wpt.Name, []]));
       filter();
@@ -96,17 +96,17 @@ function filterWptSubtree(element, event, noCollapse) {
 
 function filterLocSubtree(element, event) {
   d3.select("svg").selectAll(".link-wpt")
-    .filter(link => link.targetId == element.id)
+    .filter(link => link.targetId === element.id)
     .each(link => {
       if (event.ctrlKey) {
         const subtreesToHide = new Map(hierarchyOrig.Children.map(
           wpt => [wpt.Name, []]));
         hierarchyOrig.Children
-          .filter(wpt => wpt.Name == link.sourceName).forEach(wpt =>
-            wpt.Children.filter(loc => loc.Name != element.textContent)
+          .filter(wpt => wpt.Name === link.sourceName).forEach(wpt =>
+            wpt.Children.filter(loc => loc.Name !== element.textContent)
             .forEach(loc =>
               subtreesToHide.get(link.sourceName).push(loc.Name)));
-        if (hiddenLocSubtrees.get(link.sourceName).length ==
+        if (hiddenLocSubtrees.get(link.sourceName).length ===
           subtreesToHide.get(link.sourceName).length &&
           !hiddenLocSubtrees.get(link.sourceName).includes(
             element.textContent)) {
@@ -136,15 +136,15 @@ d3.selection.prototype.markLinks = function(highlight) {
     .style("stroke-width", highlight ? 1.5 : null)
     .each(link => {
       const curTargetStyle = link.targetNode.style("fill");
-      if (highlight && curTargetStyle == defaultNodeColor)
+      if (highlight && curTargetStyle === defaultNodeColor)
         link.targetNode.style("fill", iteratecMagentaDark);
-      else if (!highlight && curTargetStyle == iteratecMagentaDarkRgb)
+      else if (!highlight && curTargetStyle === iteratecMagentaDarkRgb)
         link.targetNode.style("fill", null);
       if (link.sourceNode) {
         const curSourceStyle = link.sourceNode.style("fill");
-        if (highlight && curSourceStyle == defaultNodeColor)
+        if (highlight && curSourceStyle === defaultNodeColor)
           link.sourceNode.style("fill", iteratecMagentaDark);
-        else if (!highlight && curSourceStyle == iteratecMagentaDarkRgb)
+        else if (!highlight && curSourceStyle === iteratecMagentaDarkRgb)
           link.sourceNode.style("fill", null);
       }
     });
@@ -158,7 +158,7 @@ function markOsmNodes(element, highlight) {
   d3.select(element).style("fill", highlight ? iteratecMagentaDark : null);
 
   svg.selectAll(".link-osm")
-    .filter(link => link.sourceName == element.textContent)
+    .filter(link => link.sourceName === element.textContent)
     .markLinks(highlight)
     .each(link => wptIds.push(link.targetId));
 
@@ -178,28 +178,28 @@ function markWptNodes(element, highlight) {
   const svg = d3.select("svg");
 
   svg.selectAll(".link-osm")
-    .filter(link => link.targetName == element.textContent)
+    .filter(link => link.targetName === element.textContent)
     .markLinks(highlight)
     .each(osmLink =>
       svg.selectAll(".link-wpt")
-      .filter(wptLink => wptLink.sourceName == element.textContent &&
+      .filter(wptLink => wptLink.sourceName === element.textContent &&
         osmToLoc[osmLink.sourceName].includes(wptLink.targetName))
       .markLinks(highlight)
       .each(wptLink =>
         svg.selectAll(".link-loc")
         .filter(locLink =>
-          locLink.sourceId == wptLink.targetId &&
+          locLink.sourceId === wptLink.targetId &&
           osmToLoc[osmLink.sourceName].includes(locLink.sourceName))
         .markLinks(highlight)));
 }
 
 function markLocUpToRoot(elementHTML, elementId, highlight, svg) {
   svg.selectAll(".link-wpt")
-    .filter(link => link.targetId == elementId)
+    .filter(link => link.targetId === elementId)
     .markLinks(highlight)
     .each(wptLink =>
       svg.selectAll(".link-osm")
-      .filter(osmLink => wptLink.sourceName == osmLink.targetName &&
+      .filter(osmLink => wptLink.sourceName === osmLink.targetName &&
         osmToLoc[osmLink.sourceName].includes(wptLink.targetName))
       .markLinks(highlight)
       .filter(osmLink => osmToLoc[osmLink.sourceName].includes(elementHTML))
@@ -210,7 +210,7 @@ function markLocNodes(element, highlight) {
   const svg = d3.select("svg");
 
   svg.selectAll(".link-loc")
-    .filter(link => link.sourceId == element.id)
+    .filter(link => link.sourceId === element.id)
     .markLinks(highlight);
 
   markLocUpToRoot(element.textContent, element.id, highlight, svg);
@@ -220,7 +220,7 @@ function markAgentNodes(element, highlight) {
   const svg = d3.select("svg");
 
   svg.selectAll(".link-loc")
-    .filter(link => link.targetId == element.id)
+    .filter(link => link.targetId === element.id)
     .markLinks(highlight)
     .each(link =>
       markLocUpToRoot(link.sourceName, link.sourceId, highlight, svg));
@@ -280,7 +280,7 @@ function drawScene() {
         i < nOfWptInstances + nOfLocations ? "node-loc" : "node-agent"))
     .attr("id", (d, i) => "node" + i.toString())
     .attr("dy", 3)
-    .style("text-anchor", d => d.depth == 3 ? "start" : "middle")
+    .style("text-anchor", d => d.depth === 3 ? "start" : "middle")
     .text(d => d.data.Name);
 
   nodes.append("title").text(d => d.data.URL);
@@ -318,7 +318,7 @@ function drawScene() {
   //the source variable of another link. That's why we need to create a new
   //object.
   treeLinks.forEach((l, i, links) => {
-    if (l.target.depth == 2) {
+    if (l.target.depth === 2) {
       links[i].source.y +=
         (wptTextWidth / 3 + edgeSpacing) / l.source.children.length;
       links[i].target = {
@@ -354,7 +354,7 @@ function drawScene() {
       sourceId: link.source.id,
       targetName: link.target.data.Name,
       targetId: link.target.id,
-      targetNode: textNodes.filter((d, j) => i == j),
+      targetNode: textNodes.filter((d, j) => i === j),
     })));
 
   //The tree is built breadth first. So we can remove the links originating
@@ -365,7 +365,7 @@ function drawScene() {
   const wptLinkNodes = links.filter(".link-wpt");
   locNodes.style("opacity", loc => {
     let hiddenSubtree = false;
-    wptLinkNodes.filter(link => link.targetId == loc.id)
+    wptLinkNodes.filter(link => link.targetId === loc.id)
       .each(link => hiddenSubtree = hiddenSubtree ||
         hiddenLocSubtrees.get(link.sourceName).includes(loc.data.Name));
     return hiddenSubtree ? hiddenSubtreeOpacity : null;
@@ -414,7 +414,7 @@ function drawScene() {
           id: wptNode.id
         }
       }));
-    const curOsmNode = osmTextNodes.filter((d, j) => i == j);
+    const curOsmNode = osmTextNodes.filter((d, j) => i === j);
 
     svg.selectAll("foo")
       .data(osmLinks)
@@ -430,7 +430,7 @@ function drawScene() {
         sourceName: osm,
         targetName: oL.target.name,
         targetId: oL.target.id,
-        targetNode: wptNodes.filter(node => node.data.Name == oL.target.name)
+        targetNode: wptNodes.filter(node => node.data.Name === oL.target.name)
       })));
   });
 
@@ -442,8 +442,8 @@ function filter() {
   const offline = showOffline.checked;
   const substring = filterSubstring.value.toLowerCase();
 
-  if ((!hiddenWptSubtrees.length || (hiddenWptSubtrees.length == 1 &&
-      hiddenWptSubtrees[0] == "www.webpagetest.org")) &&
+  if ((!hiddenWptSubtrees.length || (hiddenWptSubtrees.length === 1 &&
+      hiddenWptSubtrees[0] === "www.webpagetest.org")) &&
     !Array.from(hiddenLocSubtrees.values()).reduce(
       (hidden, locs) => hidden || locs.length, false)) {
     collapseAll.classList.add("disabled");
