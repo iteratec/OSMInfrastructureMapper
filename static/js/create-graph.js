@@ -72,7 +72,7 @@ function collapse() {
 }
 
 function filterWptSubtree(element, event, noCollapse) {
-  if (event.ctrlKey) {
+  if (event.ctrlKey || event.metaKey) {
     if (!noCollapse && hiddenWptSubtrees.length === nOfWptInstances - 1 &&
       !hiddenWptSubtrees.includes(element.textContent) &&
       !hiddenLocSubtrees.get(element.textContent).length) {
@@ -98,7 +98,7 @@ function filterLocSubtree(element, event) {
   d3.select("svg").selectAll(".link-wpt")
     .filter(link => link.targetId === element.id)
     .each(link => {
-      if (event.ctrlKey) {
+      if (event.ctrlKey || event.metaKey) {
         const subtreesToHide = new Map(hierarchyOrig.Children.map(
           wpt => [wpt.Name, []]));
         hierarchyOrig.Children
