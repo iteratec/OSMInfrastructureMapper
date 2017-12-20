@@ -73,8 +73,10 @@ function collapse() {
 
 function filterWptSubtree(element, event, noCollapse) {
   if (event.ctrlKey || event.metaKey) {
-    if (!noCollapse && hiddenWptSubtrees.length === nOfWptInstances - 1 &&
-      !hiddenWptSubtrees.includes(element.textContent) &&
+    const onlyElementCollapsed =
+      hiddenWptSubtrees.length === nOfWptInstances - 1 &&
+      !hiddenWptSubtrees.includes(element.textContent);
+    if (!noCollapse && onlyElementCollapsed &&
       !hiddenLocSubtrees.get(element.textContent).length) {
       collapse();
     } else {
@@ -106,6 +108,8 @@ function filterLocSubtree(element, event) {
             wpt.Children.filter(loc => loc.Name !== element.textContent)
             .forEach(loc =>
               subtreesToHide.get(link.sourceName).push(loc.Name)));
+
+        // Is subtreesToHide already hidden? Then collapse.
         if (hiddenLocSubtrees.get(link.sourceName).length ===
           subtreesToHide.get(link.sourceName).length &&
           !hiddenLocSubtrees.get(link.sourceName).includes(
@@ -441,11 +445,12 @@ function filter() {
   const browsers = showBrowsers.checked;
   const offline = showOffline.checked;
   const substring = filterSubstring.value.toLowerCase();
+  const allLocSubtreesCollapsed = !Array.from(hiddenLocSubtrees.values())
+    .reduce((hidden, locs) => hidden || locs.length, false);
 
-  if ((!hiddenWptSubtrees.length || (hiddenWptSubtrees.length === 1 &&
-      hiddenWptSubtrees[0] === "www.webpagetest.org")) &&
-    !Array.from(hiddenLocSubtrees.values()).reduce(
-      (hidden, locs) => hidden || locs.length, false)) {
+  if (allLocSubtreesCollapsed &&
+    (!hiddenWptSubtrees.length || (hiddenWptSubtrees.length === 1 &&
+      hiddenWptSubtrees[0] === "www.webpagetest.org"))) {
     collapseAll.classList.add("disabled");
   } else {
     collapseAll.classList.remove("disabled");
