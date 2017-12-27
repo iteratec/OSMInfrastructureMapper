@@ -65,6 +65,7 @@ label input[type=checkbox] {
 
 #header {
   display: flex;
+  justify-content: space-between;
   position: fixed;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 2px 2px 2px rgba(0,0,0, 0.1);
@@ -76,7 +77,12 @@ label input[type=checkbox] {
 }
 
 #filter {
-  margin-left: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#filter btn, #filter label, #filter input {
+  margin: 0 5px;
 }
 
 #graph {
