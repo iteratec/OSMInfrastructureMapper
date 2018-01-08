@@ -89,7 +89,8 @@ func calcData(w http.ResponseWriter, r *http.Request) {
 				shortestLabel = l
 			}
 		}
-		wptH := wptHierarchy{URL: wpt, Name: shortestLabel, Err: true}
+		wptH := wptHierarchy{URL: wpt, Name: shortestLabel, Err: true,
+			Children: []locHierarchy{}}
 
 		restURL := strings.TrimSuffix(wpt, "/") + "/getTesters.php"
 		testersXML, err := c.Get(restURL)
