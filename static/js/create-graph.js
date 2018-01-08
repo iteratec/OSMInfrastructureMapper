@@ -103,7 +103,7 @@ function filterLocSubtree(element, event) {
   d3.select("svg").selectAll(".link-wpt")
     .filter(link => link.targetId === element.id)
     .each(link => {
-      if (event.ctrlKey || event.metaKey) {
+      if (event.altKey) {
         const subtreesToHide = new Map(hierarchyOrig.Children.map(
           wpt => [wpt.Name, []]));
         hierarchyOrig.Children
