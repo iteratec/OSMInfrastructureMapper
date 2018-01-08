@@ -12,6 +12,56 @@
   <div id=header>
     <h2>OSM Infrastructure Mapper</h2>
     <span id="filter">
+      <a class="btn btn-link" onclick="openInfoModal()">Info</a>
+      <div class="modal" id="info-modal">
+        <a class="modal-overlay" aria-label="Close" onclick="closeInfoModal()"></a>
+        <div class="modal-container">
+          <div class="modal-header">
+            <a class="btn btn-clear float-right" aria-label="Close" onclick="closeInfoModal()"></a>
+            <div class="modal-title h5">Info</div>
+          </div>
+          <div class="modal-body">
+            <div class="content">
+              <h4>Color Legend</h4>
+              <ul>
+                <li class="alert">Error, see server log for details.</li>
+                <li class="warn">More than 30 minutes have passed since last check of wpt agent.</li>
+                <li class="opaque">Subtree hidden</li>
+              </ul>
+              <h4>Usage</h4>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nodes</th>
+                    <th>Shortcut</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>WPT Servers &amp; Locations</td>
+                    <td><code>click</code></td>
+                    <td>Collapse node.</td>
+                  </tr>
+                  <tr>
+                    <td>WPT Servers &amp; Locations</td>
+                    <td><code>alt + click</code></td>
+                    <td>Collapse all other nodes.</td>
+                  </tr>
+                  <tr>
+                    <td>WPT Servers</td>
+                    <td><code>ctrl/cmd + click</code></td>
+                    <td>Open WPT server in new tab.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-link" aria-label="Close" onclick="closeInfoModal()">Close</a>
+          </div>
+        </div>
+      </div>
       <btn id="collapseAll" class="btn disabled" onclick="collapse()">Collapse all</btn>
       <label id="showOfflineLabel" class="btn">
         <input id="showOffline" type="checkbox" onchange="filter()"/>
@@ -26,15 +76,6 @@
   </div>
 
   <svg id="graph" />
-
-  <div id="legend" class="hidden">
-    <h3>Color Legend</h3>
-    <ul>
-      <li class="alert">Error, see server log for details.</li>
-      <li class="warn">More than 30 minutes have passed since last check of wpt agent.</li>
-      <li class="opaque">Subtree hidden</li>
-    </ul>
-  </div>
 
   <script src="js/create-graph.js"></script>
 </body>

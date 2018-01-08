@@ -234,9 +234,6 @@ function markAgentNodes(element, highlight) {
 }
 
 function drawScene() {
-  //Avoid jumping of the legend from the top to the bottom by hiding it until
-  //the graph is rendered:
-  document.getElementById("legend").className = "hidden";
   d3.select("svg").selectAll("*").remove();
 
   //Subtract a constant from the window.innerWidth to compensate for the width
@@ -440,8 +437,6 @@ function drawScene() {
         targetNode: wptNodes.filter(node => node.data.Name === oL.target.name)
       })));
   });
-
-  document.getElementById("legend").className = null;
 }
 
 function filter() {
@@ -536,3 +531,13 @@ d3.json("getData", data => {
   collapse();
   window.addEventListener('resize', drawScene);
 });
+
+function openInfoModal() {
+  const modalContainer = document.querySelector('#info-modal');
+  modalContainer.classList.toggle('active', true);
+}
+
+function closeInfoModal() {
+  const modalContainer = document.querySelector('#info-modal');
+  modalContainer.classList.toggle('active', false);
+}
