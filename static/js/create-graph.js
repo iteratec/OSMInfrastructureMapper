@@ -75,8 +75,7 @@ function filterWptSubtree(element, event, noCollapse) {
   if (event.ctrlKey || event.metaKey) {
     const wptServerUrl = element.nextElementSibling.textContent.toString();
     window.open(wptServerUrl, '_blank');
-  }
-  else if (event.altKey) {
+  } else if (event.altKey) {
     const onlyElementCollapsed =
       hiddenWptSubtrees.length === nOfWptInstances - 1 &&
       !hiddenWptSubtrees.includes(element.textContent);
