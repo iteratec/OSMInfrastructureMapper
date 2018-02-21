@@ -401,6 +401,7 @@ function drawScene() {
     .attr("dy", 3)
     .attr("onmouseover", "markOsmNodes(this, true)")
     .attr("onmouseout", "markOsmNodes(this)")
+    .attr("onclick", "openOsmSite(this)")
     .style("fill", osm => osmInfo[osm].Err ? red : null);
 
   osmNodes.append("title").text(osm => osmInfo[osm].URL);
@@ -531,6 +532,13 @@ d3.json("getData", data => {
   collapse();
   window.addEventListener('resize', drawScene);
 });
+
+function openOsmSite(element) {
+  if (event.ctrlKey || event.metaKey) {
+      const osmSiteUrl = element.nextElementSibling.textContent.toString();
+      window.open(osmSiteUrl, '_blank');
+    }
+}
 
 function openInfoModal() {
   const modalContainer = document.querySelector('#info-modal');

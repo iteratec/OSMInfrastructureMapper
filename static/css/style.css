@@ -33,7 +33,7 @@ body {
   fill: #2f323a;
 }
 
-.node-wpt, .node-loc {
+.node-wpt, .node-loc, .node-osm {
   cursor: pointer;
 }
 
