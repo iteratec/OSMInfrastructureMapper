@@ -535,9 +535,9 @@ d3.json("getData", data => {
 
 function openOsmSite(element) {
   if (event.ctrlKey || event.metaKey) {
-      const osmSiteUrl = element.nextElementSibling.textContent.toString();
-      window.open(osmSiteUrl, '_blank');
-    }
+    const osmSiteUrl = element.nextElementSibling.textContent.toString();
+    window.open(osmSiteUrl, '_blank');
+  }
 }
 
 function openInfoModal() {
