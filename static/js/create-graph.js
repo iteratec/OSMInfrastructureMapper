@@ -522,17 +522,6 @@ function filter() {
   drawScene();
 }
 
-d3.json("getData", data => {
-  osmInfo = data.OsmToInfo;
-  hierarchyOrig = data.Hierarchy;
-  browserHierarchy = data.BrowserHierarchy;
-  osmNames = Object.keys(osmInfo);
-  nOfOsmInstances = osmNames.length;
-
-  collapse();
-  window.addEventListener('resize', drawScene);
-});
-
 function openOsmSite(element) {
   if (event.ctrlKey || event.metaKey) {
     const osmSiteUrl = element.nextElementSibling.textContent.toString();
@@ -549,3 +538,14 @@ function closeInfoModal() {
   const modalContainer = document.querySelector('#info-modal');
   modalContainer.classList.toggle('active', false);
 }
+
+d3.json("getData", data => {
+  osmInfo = data.OsmToInfo;
+  hierarchyOrig = data.Hierarchy;
+  browserHierarchy = data.BrowserHierarchy;
+  osmNames = Object.keys(osmInfo);
+  nOfOsmInstances = osmNames.length;
+
+  collapse();
+  window.addEventListener('resize', drawScene);
+});
