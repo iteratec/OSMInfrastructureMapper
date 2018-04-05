@@ -71,11 +71,11 @@ function collapse() {
   filter();
 }
 
-function filterWptSubtree(element, event, noCollapse) {
-  if (event.ctrlKey || event.metaKey) {
+function filterWptSubtree(element, noCollapse) {
+  if (d3.event.ctrlKey || d3.event.metaKey) {
     const wptServerUrl = element.nextElementSibling.textContent.toString();
     window.open(wptServerUrl, '_blank');
-  } else if (event.altKey) {
+  } else if (d3.event.altKey) {
     const onlyElementCollapsed =
       hiddenWptSubtrees.length === nOfWptInstances - 1 &&
       !hiddenWptSubtrees.includes(element.textContent);
@@ -99,11 +99,11 @@ function filterWptSubtree(element, event, noCollapse) {
   }
 }
 
-function filterLocSubtree(element, event) {
+function filterLocSubtree(element) {
   d3.select("svg").selectAll(".link-wpt")
     .filter(link => link.targetId === element.id)
     .each(link => {
-      if (event.altKey) {
+      if (d3.event.altKey) {
         const subtreesToHide = new Map(hierarchyOrig.Children.map(
           wpt => [wpt.Name, []]));
         hierarchyOrig.Children
@@ -121,7 +121,7 @@ function filterLocSubtree(element, event) {
         } else {
           filterWptSubtree({
             textContent: link.sourceName
-          }, event, true);
+          }, true);
           hiddenLocSubtrees = subtreesToHide;
           filter();
         }
@@ -377,10 +377,14 @@ function drawScene() {
 
   wptNodes.attr("onmouseover", "markWptNodes(this, true)")
     .attr("onmouseout", "markWptNodes(this)")
-    .attr("onclick", "filterWptSubtree(this, event)");
+    .on("click", function() {
+      filterWptSubtree(this);
+    });
   locNodes.attr("onmouseover", "markLocNodes(this, true)")
     .attr("onmouseout", "markLocNodes(this)")
-    .attr("onclick", "filterLocSubtree(this, event)");
+    .on("click", function() {
+      filterLocSubtree(this);
+    });
   agentNodes.attr("onmouseover", "markAgentNodes(this, true)")
     .attr("onmouseout", "markAgentNodes(this)");
 
@@ -401,7 +405,10 @@ function drawScene() {
     .attr("dy", 3)
     .attr("onmouseover", "markOsmNodes(this, true)")
     .attr("onmouseout", "markOsmNodes(this)")
-    .attr("onclick", "openOsmSite(this)")
+    .on("click", function(osm) {
+      if (d3.event.ctrlKey || d3.event.metaKey)
+        window.open(osmInfo[osm].URL, '_blank');
+    })
     .style("fill", osm => osmInfo[osm].Err ? red : null);
 
   osmNodes.append("title").text(osm => osmInfo[osm].URL);
@@ -520,13 +527,6 @@ function filter() {
     (sum, wpt) => sum + (wpt.children ? 0 : 1), 0);
 
   drawScene();
-}
-
-function openOsmSite(element) {
-  if (event.ctrlKey || event.metaKey) {
-    const osmSiteUrl = element.nextElementSibling.textContent.toString();
-    window.open(osmSiteUrl, '_blank');
-  }
 }
 
 function openInfoModal() {
